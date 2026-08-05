@@ -1,199 +1,364 @@
-# Language Traveler
+<div align="center">
 
-**A cross-platform mobile app for learning languages through curated articles, structured courses, and spaced-repetition vocabulary practice.**
+# Radora
 
-![React Native](https://img.shields.io/badge/React_Native-0.81-61DAFB?logo=react&logoColor=white)
-![Expo](https://img.shields.io/badge/Expo_SDK-54-000020?logo=expo&logoColor=white)
-![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178C6?logo=typescript&logoColor=white)
-![Supabase](https://img.shields.io/badge/Supabase-BaaS-3FCF8E?logo=supabase&logoColor=white)
-![Platform](https://img.shields.io/badge/Platform-iOS%20%7C%20Android-lightgrey)
+**Learn English by reading. A production React Native app built on a shared monorepo foundation.**
 
-## Overview
+Vocabulary that teaches itself through articles you actually want to read — one scheduling engine on the client, one source of truth on the server.
 
-Language Traveler is a full-featured language learning mobile application built from the ground up as a solo project. It combines article-based reading practice, structured course lessons, and SRS-powered vocabulary review into a single cohesive experience — currently supporting English, Spanish, and Turkish.
+[![React Native](https://img.shields.io/badge/React%20Native-0.83-61DAFB?style=flat-square&logo=react&logoColor=white)](https://reactnative.dev/)
+[![Expo](https://img.shields.io/badge/Expo%20SDK-55-000020?style=flat-square&logo=expo&logoColor=white)](https://expo.dev/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.9%20strict-3178C6?style=flat-square&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Supabase](https://img.shields.io/badge/Supabase-Postgres%20%2B%20Edge-3FCF8E?style=flat-square&logo=supabase&logoColor=white)](https://supabase.com/)
+[![RevenueCat](https://img.shields.io/badge/RevenueCat-StoreKit%202-F25A5A?style=flat-square)](https://www.revenuecat.com/)
+[![Platform](https://img.shields.io/badge/Platform-iOS%20%7C%20Android-6b7280?style=flat-square)](#)
+[![Status](https://img.shields.io/badge/Status-Pre--release-f59e0b?style=flat-square)](#)
+[![Source](https://img.shields.io/badge/Source-Private-1f2937?style=flat-square)](#)
 
-The app follows a local-first architecture: user progress, saved words, and content are cached on-device using MMKV and Zustand persistence, with Supabase handling backend data and authentication. TanStack Query manages all server state with offline-aware caching and automatic revalidation, ensuring the app remains responsive even with intermittent connectivity.
+`EN` · `ES` · `TR` &nbsp;·&nbsp; [Contact](#contact)
 
-Built with Expo's managed workflow and delivered to both TestFlight and Google Play Console via EAS Build, the project covers the full lifecycle — from authentication (Apple Sign-In, Google OAuth, passwordless email OTP) and push notifications to OTA updates and gamification with an XP system.
-
-## Tech Stack
-
-| Category              | Technology                               | Purpose                                     |
-| --------------------- | ---------------------------------------- | ------------------------------------------- |
-| **Framework**         | React Native 0.81 + Expo SDK 54          | Cross-platform mobile (iOS & Android)       |
-| **Language**          | TypeScript 5.9                           | Type safety across the entire codebase      |
-| **Runtime**           | Hermes                                   | Optimized JS engine for React Native        |
-| **Navigation**        | Expo Router 6                            | File-based routing with layout groups       |
-| **State (Client)**    | Zustand 4                                | Client state with 11 persisted slices       |
-| **State (Server)**    | TanStack React Query 5                   | Server state, caching & offline persistence |
-| **Backend**           | Supabase                                 | Auth, database, real-time                   |
-| **Auth**              | Apple Sign-In · Google OAuth · Email OTP | Three passwordless auth providers           |
-| **Storage**           | MMKV · Expo SecureStore                  | Fast KV store + encrypted auth tokens       |
-| **Localization**      | i18next + react-i18next                  | Multi-language UI (EN, ES, TR)              |
-| **Animations**        | React Native Reanimated 4                | Gesture-driven & layout animations          |
-| **Lists**             | Shopify FlashList                        | High-performance virtualized lists          |
-| **Networking**        | NetInfo + custom retry                   | Offline detection & resilient fetching      |
-| **Notifications**     | Expo Notifications                       | Push notifications with preferences         |
-| **Push Delivery**     | Firebase FCM + APNs                      | Remote push notifications (iOS & Android)   |
-| **OTA Updates**       | EAS Update                               | Over-the-air JS bundle updates              |
-| **Haptics**           | Expo Haptics                             | Tactile feedback on interactions            |
-| **Images**            | Expo Image                               | Performant image loading with caching       |
-| **UI Polish**         | Expo Blur · Linear Gradient · SVG        | Visual effects and vector graphics          |
-| **Edge Functions**    | Supabase Edge Functions                  | Serverless business logic                   |
-| **Database Security** | Supabase RLS                             | Row Level Security on all tables            |
-| **Server Logic**      | Supabase RPC + pg_cron                   | Server-side functions & scheduled jobs      |
-| **Admin Panel**       | Next.js + Vercel                         | Content management & notification control   |
-| **Testing**           | Jest + React Native Testing Library      | Unit and component tests                    |
-| **Build & Deploy**    | EAS Build                                | Cloud builds for TestFlight & Play Console  |
-
-## Screenshots
-
-<!-- Add 3-4 app screenshots here -->
-
-## Architecture
-
-### Project Structure
-
-```
-app/                          # Expo Router — file-based routing
-├── (auth)/                   # Auth screens (login, register, privacy)
-├── (onboarding)/             # Onboarding flow
-├── (tabs)/                   # Main tab navigator (home, explore, profile)
-├── article/                  # Article detail & reading screens
-├── course/                   # Course detail & unit screens
-├── learn/lesson/             # Lesson & quiz screens
-└── word/                     # Word detail screens
-
-src/
-├── components/               # UI components by feature
-│   ├── auth/                 #   Auth-specific (rate limit countdown)
-│   ├── cards/                #   Content cards
-│   ├── completion/           #   XP completion modals
-│   ├── forms/                #   Language picker, input forms
-│   ├── loading/              #   Skeleton loaders
-│   ├── notifications/        #   Swipeable notification items
-│   ├── study/                #   Study session components
-│   ├── ui/                   #   Shared UI (toast, bottom sheet, flash list)
-│   ├── word/                 #   Word display & review
-│   ├── xp-animation/         #   XP animation provider & overlays
-│   └── xp-display/           #   XP badge, progress bar, streak display
-├── constants/                # Environment config, app constants
-├── hooks/                    # Custom hooks
-│   └── queries/              #   TanStack Query hooks (articles, courses, words, gamification)
-├── lib/                      # Core infrastructure
-│   ├── storage/              #   MMKV + SecureStore adapters
-│   └── supabase/             #   Client, auth providers, network-aware fetch
-├── localization/             # i18next translations
-│   ├── en/                   #   English (10 namespace files)
-│   ├── es/                   #   Spanish
-│   └── tr/                   #   Turkish
-├── services/                 # Business logic (rate limiter, OTA updates, word progress)
-├── store/                    # Zustand store
-│   └── slices/               #   11 slices (auth, settings, study, articles, content, activity, cache, lessons, network, progress, toast)
-├── styles/                   # Shared styles
-├── types/                    # TypeScript type definitions
-└── utils/                    # Utility functions & animation helpers
-```
-
-### Architectural Approach
-
-The app follows a **feature-first, local-first** architecture with clear state separation. Client state (auth, settings, study progress, UI) lives in Zustand with MMKV persistence, while server state (articles, courses, word lists, gamification) is managed by TanStack React Query with offline-first caching and MMKV-backed persistence. This separation ensures the app remains fully functional offline while syncing seamlessly when connectivity returns.
-
-### Data Flow
-
-User actions flow from UI components through custom hooks, which dispatch to either Zustand slices (for client state) or TanStack Query mutations (for server state). Mutations hit Supabase via a network-aware fetch wrapper that checks connectivity, applies exponential backoff retry, and falls back to cached data when offline. Optimistic updates in React Query provide instant UI feedback while the backend sync happens asynchronously.
-
-## Key Features
-
-### Authentication
-
-Three passwordless authentication providers are implemented, each with its own dedicated service module and built-in rate limiting:
-
-- **Apple Sign-In** — Native iOS authentication via `expo-apple-authentication` integrated with Supabase Auth. Platform-gated to iOS only.
-- **Google OAuth** — Browser-based OAuth flow using `expo-auth-session` and `expo-web-browser`, with token extraction from callback URLs supporting both hash and query parameter formats.
-- **Email OTP** — Passwordless magic code authentication through Supabase's built-in OTP system. Supports send, verify, and resend flows with per-email and global rate limiting.
-
-All three providers share a unified rate limiting system with sliding window algorithm, persistent attempt tracking via MMKV, and configurable block durations (e.g., 5 email OTP sends/hour, 10 OTP verifications/15 min, 35 global auth attempts/hour). Auth tokens are stored in iOS Keychain / Android Keystore via `expo-secure-store`, with automatic fallback to MMKV for oversized tokens (>2KB).
-
-Account deletion is available in settings — it clears all local data (Zustand store, React Query cache, content cache, notification state, MMKV storage), signs out from Supabase, and redirects to login.
-
-### Push Notifications
-
-The notification system is built on Expo Notifications with Firebase FCM (Android) and APNs (iOS) for remote delivery:
-
-- **Token Registration** — On app launch, the device's Expo push token is retrieved and stored in Supabase alongside device metadata (model, brand, platform). An Android notification channel is configured with max importance, vibration, and custom light color.
-- **Notification Handling** — Foreground notifications display as alerts with sound and badge. Tapped notifications support deep linking via validated URL paths from notification data. Cold-start taps (app opened from killed state) are handled with a delayed response check.
-- **Notification History** — Up to 10 recent notifications are fetched from Supabase, with 8 notification types mapped to distinct icons and colors (achievement, streak, reminder, daily reminder, word review, new content, course completion, default). Each notification displays a relative timestamp and an unread indicator.
-- **User Preferences** — A per-user `notifications_enabled` toggle is synced to Supabase with optimistic UI updates and rollback on failure. Preferences auto-refresh when the app returns to foreground.
-- **Swipe to Delete** — Notification items support left-swipe gesture deletion with animated card translation and fade-in delete button, powered by React Native Gesture Handler and Reanimated.
-
-### Gamification
-
-A full XP and progression system drives engagement across all learning activities:
-
-- **XP Economy** — Nine distinct XP sources with defined values: word learned (4 XP), word reviewed (1 XP), article completed (20 XP), lesson completed (20 XP), daily activity (4 XP), with streak bonuses at 7-day (+12 XP) and 28-day (+32 XP) milestones.
-- **Level System** — Users progress through levels based on accumulated XP. Level-up events trigger animated celebration modals with trophy icons, count-up XP animations, and haptic feedback.
-- **Streak Tracking** — Daily activity streaks are tracked server-side via a `check_daily_activity_and_streak` RPC call. The UI displays current streak with contextual emojis and highlights 7-day and 28-day milestones with distinct styling.
-- **XP Animations** — A queue-based animation system renders three animation types (XP earned, level up, streak bonus) sequentially via a React Context provider. Each animation has configurable duration, easing, and haptic feedback, with accessibility support for reduced motion preferences.
-- **Activity Tracking** — Daily activity is recorded across four dimensions (words learned, articles read, reviews done, lessons completed) with weighted scoring for weekly activity summaries.
-
-All XP mutations use TanStack Query with optimistic updates for instant UI feedback, and the entire gamification UI is localized across all three supported languages.
-
-### Learning Engine
-
-The core learning engine combines spaced repetition vocabulary practice with structured course progression:
-
-- **Spaced Repetition (SRS)** — A 7-level fixed-interval schedule governs word review timing: 1 day, 3 days, 7 days, 1 month, 3 months, 6 months, 1 year. Words at mastery level 6+ are considered "mastered" and automatically removed from the hard words list. A daily cap of 2 level-ups per word prevents gaming the system.
-- **Word Progress** — Each word tracks mastery level (0–7), next review date, and daily level-up count. Correct answers advance the level and schedule the next review; incorrect answers decrement the level and reset to a 1-day interval. Review queues are sorted by oldest review date first, then lowest mastery level.
-- **Course & Lesson Structure** — Content is organized as Courses > Units > Lessons > Sentences + Quizzes. Lessons support four quiz types: multiple choice, true/false, fill in the blank, and sentence ordering. Lessons unlock sequentially — each requires completing the previous one.
-- **Progress Resumption** — Lesson progress tracks sentence index, scroll position percentage, time spent, quiz scores, and attempt count, enabling users to resume exactly where they left off.
-- **Dual-State Architecture** — A local `StudySlice` handles immediate UI state while a server-synced `ProgressSlice` serves as the source of truth. Sync uses a merge (union) strategy to prevent data loss, with an explicit replace option for full server resets.
-
-### Localization
-
-The app supports three languages (English, Spanish, Turkish) with full UI localization:
-
-- **i18next Integration** — Translation files are dynamically loaded across 10 namespaces (common, navigation, onboarding, settings, study, profile, auth, premium, legal, gamification) with `@formatjs/intl-pluralrules` polyfills for Hermes compatibility.
-- **System Language Detection** — On first launch, `expo-localization` detects the device language and falls back to English for unsupported languages. Users can override with a manual "system" or explicit language setting.
-- **Language Switching** — Changing the learning or translation language validates against duplicates (auto-swaps if the same language is selected for both), clears the content cache, and triggers a full content reload to fetch language-appropriate material.
-
-### Offline Support
-
-The app is designed to work offline-first with multi-layer caching and graceful degradation:
-
-- **Network Detection** — Real-time connectivity monitoring via `@react-native-community/netinfo` feeds a Zustand network slice. The app defaults to "online" optimistically until the listener reports otherwise.
-- **MMKV Storage** — Two dedicated MMKV instances (main state + content cache) provide fast, synchronous key-value storage. Instances are lazily initialized on first access to reduce boot time. Auth tokens use a tiered strategy: `expo-secure-store` (Keychain/Keystore) as primary, with automatic MMKV fallback for oversized tokens.
-- **React Query Persistence** — The query client is configured with `networkMode: 'offlineFirst'`, 5-minute stale time, 24-hour garbage collection, and MMKV-backed persistence. Only successful queries are persisted. `refetchOnReconnect: 'always'` ensures data freshness when connectivity returns.
-- **Network-Aware Fetch** — A centralized `networkAwareFetch` wrapper checks online status before every API call, supports fallback data sources for offline scenarios, and offers silent-fail or throw-error strategies per call site.
-- **Content Cache** — Large content arrays (articles, word lists, courses) are stored in a separate MMKV instance with a 24-hour TTL, avoiding bloat in the main Zustand persistence layer.
-
-## Technical Challenges
-
-### Zustand Hydration Race Condition
-
-On iOS, the `onRehydrateStorage` callback in Zustand's persist middleware is asynchronous, meaning `index.tsx` can render before hydration completes. This caused the app to briefly show the onboarding screen to already-authenticated users. The fix ensures `_hasHydrated` is set to `true` in every code path — successful rehydration, null state, and error — so the root layout always waits for hydration before routing decisions.
-
-### Data Migration Without Data Loss
-
-As the state architecture evolved from a single study slice to a dedicated progress slice, persisted data needed migration. The rehydration logic merges old and new storage using Set unions (`[...new Set([...oldData, ...newData])]`), with the progress slice as the source of truth and old data as fallback. Both layers are kept in sync to prevent inconsistency during the transition.
-
-### Multi-Layer Cache Architecture
-
-Content caching required separating concerns across three layers: MMKV for fast synchronous access (dual instances for state vs. content), React Query for server state with offline-first network mode and selective persistence, and Zustand for client state with custom `partialize` to control what gets persisted. The content cache uses a 24-hour TTL with explicit validation on rehydration, and expired caches trigger a background refetch rather than blocking the UI.
-
-### Auth Token Storage with Tiered Fallback
-
-`expo-secure-store` has a ~2KB size limit per item, which some JWT tokens exceed. The auth storage adapter tries SecureStore first, falls back to MMKV for oversized tokens, and automatically cleans up duplicates when tokens migrate between stores. This ensures secure storage is used whenever possible without breaking authentication for edge cases.
-
-### Production Splash Screen Delay (Android)
-
-Content initialization was blocking the splash screen dismissal, causing 15–30 second waits on Android in production. The fix defers content loading to `InteractionManager.runAfterInteractions`, decoupling it from the splash screen lifecycle. An `AbortController` pattern prevents stale state updates if the initialization effect is re-triggered before completion.
-
-### Client-Side Rate Limiting
-
-To protect auth endpoints from abuse without relying solely on server-side limits, a sliding window rate limiter persists attempt timestamps in MMKV. Each auth action has granular limits (e.g., 5 email OTP sends/hour with a 30-minute block, 35 global auth attempts/hour). The UI displays countdown timers when rate-limited, and all limits can be cleared on successful authentication.
+</div>
 
 ---
 
-_This is a showcase repository. Source code is private._
-_For inquiries, reach out via [LinkedIn](https://www.linkedin.com/in/anil-burcu/)._
+## Overview
+
+Radora teaches English through reading. Instead of drilling word lists in isolation, it closes a loop: you pick topics you care about, learn a themed set of words, read an article built from those exact words, then reinforce whatever didn't stick. Every screen in the app is a station on that loop.
+
+The app is the first tenant of a React Native monorepo. Nine `@anilburcu/*` packages own the concerns that repeat across products — auth, push, subscriptions, telemetry, permissions, onboarding, UI primitives — while the app repo owns only what makes Radora *Radora*: the study engine, the vocabulary model, the content pipeline, and the schema behind them.
+
+This README is a walk through the engineering, not a feature list.
+
+## At a Glance
+
+|                    |                                                                                     |
+| ------------------ | ----------------------------------------------------------------------------------- |
+| **Platforms**      | iOS and Android — one TypeScript codebase, Hermes, New Architecture                 |
+| **App code**       | ~44K lines TypeScript across 11 feature modules, 28 routes                          |
+| **Database**       | 49 tables, RLS on every one of them, 78 policies, 51 Postgres functions             |
+| **Migrations**     | 32 sequential migrations, applied test-first before production                      |
+| **Serverless**     | 8 Deno Edge Functions — subscriptions, push delivery, account deletion              |
+| **Shared packages**| 9 workspace packages, each independently consumable                                 |
+| **Offline**        | 3 idempotent MMKV retry queues, React Query persisted to disk with a build-keyed bust |
+| **Localization**   | English, Spanish, Turkish — 10 namespaces, content translated at the row level      |
+| **Monetization**   | RevenueCat on StoreKit 2, entitlement decided by a single server predicate          |
+
+## The Loop
+
+The product thesis in one diagram. Everything the app does exists to move a word from *unseen* to *mastered*, and the article layer is what makes that feel like reading rather than drilling.
+
+```mermaid
+flowchart LR
+    A["Onboarding<br/><small>pick interest topics</small>"] --> B["Themed word list<br/><small>sliced into 10-word chunks</small>"]
+    B --> C["Study session<br/><small>teach · quiz · re-quiz</small>"]
+    C --> D["Article<br/><small>built from those words</small>"]
+    D --> E["Pre-reading quiz<br/><small>+ tap any word to save</small>"]
+    E --> F["SRS review<br/><small>server-scheduled</small>"]
+    F -->|"level up — interval grows"| C
+    F -->|"mastery 7"| G["Mastered<br/><small>next review in a year</small>"]
+    D -.->|"coverage query<br/>suggests what's next"| B
+
+    classDef learn fill:#1f6feb,color:#fff,stroke:#1f6feb
+    classDef read fill:#0d9488,color:#fff,stroke:#0d9488
+    classDef done fill:#7c3aed,color:#fff,stroke:#7c3aed
+    class B,C learn
+    class D,E read
+    class G done
+```
+
+Word lists and articles are linked at the **word level**, not by tag. Four `SECURITY DEFINER` recommendation RPCs run coverage queries — *which article uses the most words you already know?* — and return only IDs and counters, never sentence text, so the same engine can recommend a premium article to a free user as a locked card without leaking its content.
+
+## Architecture
+
+```mermaid
+flowchart TB
+    routes["<b>expo-router</b> — 33 routes<br/><small>public · auth · protected</small>"]
+    feat["<b>11 feature modules</b><br/><small>vocabulary · study-session · articles · gamification<br/>progress · subscription · content · notifications · settings</small>"]
+    state["<b>State</b><br/><small>Zustand client · TanStack Query server · MMKV ×3</small>"]
+    queues["<b>Retry queues</b><br/><small>vocabulary · SRS · XP</small>"]
+    pkgs["<b>@anilburcu/*</b> — 9 shared packages<br/><small>auth · push · subscription · supabase-core · telemetry<br/>ui-kit · onboarding · permissions · shared-utils</small>"]
+    pg[("<b>Postgres</b><br/><small>49 tables · 78 RLS policies · 51 functions</small>")]
+    edge["<b>8 Edge Functions</b><br/><small>Deno</small>"]
+    rt["<b>Realtime</b><br/><small>content publication</small>"]
+    ext["<b>RevenueCat · Sentry · PostHog · Expo Push</b>"]
+
+    routes --> feat
+    feat --> state
+    feat --> queues
+    feat --> pkgs
+    state <--> pg
+    queues -->|"drain on reconnect"| pg
+    pkgs --> edge
+    pkgs --> ext
+    edge --> pg
+    edge --> ext
+    pg --> rt
+    rt -.->|"batched invalidation"| state
+
+    classDef c fill:#1f6feb,color:#fff,stroke:#1f6feb
+    classDef s fill:#0d9488,color:#fff,stroke:#0d9488
+    classDef p fill:#7c3aed,color:#fff,stroke:#7c3aed
+    classDef e fill:#4b5563,color:#fff,stroke:#4b5563
+    class routes,feat,state,queues c
+    class pg,edge,rt s
+    class pkgs p
+    class ext e
+```
+
+### Monorepo boundaries
+
+The app and the monorepo are separate git repositories — the app lives at `apps/radora` inside the workspace, with its own history. Installs always run from the workspace root; a `preinstall` guard fails loudly if someone tries to install from the app directory, because `@anilburcu/*` is unpublished and resolves only through workspaces.
+
+The packages hold one hard rule: **no package depends on another package's tables.** `push` doesn't know about `auth`; `subscription` doesn't know about `push`. They all reference `auth.users` and nothing else. That constraint is what makes the second app cheap — pull in `auth` and `subscription`, skip the rest, no untangling.
+
+| Package | Owns |
+| --- | --- |
+| `auth` | Apple / Google / email OTP, session store, rate limiting |
+| `push` | Token registration, channels, inbox, receipt verification |
+| `subscription` | RevenueCat lifecycle, entitlement cache, conflict recovery |
+| `supabase-core` | Client factory, MMKV instances, Zustand storage adapter, polyfills |
+| `telemetry` | Sentry + PostHog wiring, error boundary, release tagging |
+| `ui-kit` | Shared components, theme primitives |
+| `onboarding` | Step framework and screens |
+| `permissions` | Permission prompts and state |
+| `shared-utils` | Retry, timeout, in-flight guards, logging |
+
+## The Study Session Engine
+
+The most interesting code in the app is a pure reducer with no imports.
+
+**The problem.** The first engine was a round machine: teach a batch, quiz the batch in the same order, replay the misses as a block at the end. It worked, and it was boring — after two rounds the learner knew exactly what was coming, and prediction is the enemy of recall.
+
+**The rewrite.** Rounds are gone. There is one queue of scheduled steps, and answering a question re-inserts that word at a *variable distance* ahead:
+
+```mermaid
+stateDiagram-v2
+    direction LR
+    [*] --> Teach: word introduced
+    Teach --> Quiz: gap 1–2 steps
+    Quiz --> Quiz: correct — gap c+1…c+2
+    Quiz --> Requiz: wrong — gap 1–3 steps
+    Requiz --> Quiz
+    Quiz --> Reteach: 2 wrong in a row
+    Reteach --> Quiz
+    Quiz --> Mastered: requiredCorrects reached
+    Mastered --> [*]
+```
+
+The rules that make it feel human rather than mechanical:
+
+- **One step per word, always.** Every introduced-but-unmastered word owns exactly one step — either on screen or somewhere in the queue. No duplicates, no orphans.
+- **Expanding rehearsal.** The more times you've got a word right, the further out its next appearance lands. When the active set is small the gap clamps to the end of the queue, which produces the "asked me second-to-last" effect that makes the end of a session feel earned.
+- **A slip isn't a reset.** Wrong answers don't zero the correct-count. Two consecutive misses schedule a real re-teach card; a single miss reuses the feedback card as the reminder.
+- **New words are drip-fed.** The session opens with two teach cards, then introduces a new word only when an existing one survives its first quiz or masters out. A struggling learner stops receiving new material automatically.
+- **Deterministic jitter.** All randomness comes from a seeded PRNG whose state lives inside the session object, so the reducer stays pure. Tests pass a fixed seed and assert exact sequences; production picks a random one.
+
+The engine never touches the network. The UI observes transitions and fires the side effects — which is what makes the whole thing unit-testable without a single mock.
+
+## Spaced Repetition — Server Authoritative
+
+Session mastery is short-term. Long-term retention runs on a seven-step ladder, where the mastery level *is* the interval:
+
+| Mastery | 1 | 2 | 3 | 4 | 5 | 6 | 7 |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| **Next review in** | 1 day | 3 days | 7 days | 30 days | 90 days | 180 days | 365 days |
+
+The whole decision lives in one `SECURITY DEFINER` Postgres function. `record_word_review(word_id, is_correct)` returns the new mastery level, the next review date, and whether the word leveled up; the client reconciles against that answer instead of predicting it. Three properties fall out of putting it there:
+
+- **You can't farm a word.** A correct answer only levels a word up if its review is actually *due*. Answering the same word ten times in one sitting advances it exactly once — and since a level-up pushes the next review into the future, the second attempt is by definition not due. The cap is a consequence of the schedule, not a counter that needs its own enforcement.
+- **You can't tank a word either.** A wrong answer drops the level by one and resets the interval to a day, but only the *first* miss each day is penalised. `last_incorrect_at` absorbs the rest, so fumbling a word repeatedly in one session costs you one level, not five.
+- **Concurrent writes serialize.** Review, add-to-vocabulary, and remove-from-vocabulary all take the same per-`(user, word)` advisory lock, so a drained retry queue racing a live session can't interleave into a torn progress row.
+
+Timezone matters here and is handled explicitly: "today" is computed from the user's stored timezone preference, not the server's clock, so a review due date doesn't roll over at the wrong hour for anyone.
+
+## Writes That Survive a Bad Network
+
+Three MMKV-backed queues catch failed writes and drain them on app start, on reconnect, and on foreground.
+
+```mermaid
+flowchart TB
+    act["User action<br/><small>save word · answer drill · finish session</small>"] --> rpc{"RPC call"}
+    rpc -->|"success"| ok["Reconcile local state"]
+    rpc -->|"permanent error<br/>4xx, validation, word cap"| drop["Surface to user<br/><small>no retry</small>"]
+    rpc -->|"transient error<br/>network, 5xx"| q[("MMKV queue<br/><small>vocabulary · SRS · XP</small>")]
+    q --> dr["Drain<br/><small>on app start · on reconnect · on foreground</small>"]
+    dr -->|"replay — idempotent by construction"| rpc
+    q -.->|"older than 24h"| exp["Dropped<br/><small>stale writes don't resurrect</small>"]
+
+    classDef good fill:#0d9488,color:#fff,stroke:#0d9488
+    classDef bad fill:#b91c1c,color:#fff,stroke:#b91c1c
+    classDef store fill:#1f6feb,color:#fff,stroke:#1f6feb
+    class ok,dr good
+    class drop,exp bad
+    class q store
+```
+
+Replay is only safe because every queued RPC is idempotent by construction:
+
+- **Vocabulary** — `add_word_to_vocabulary` reactivates a soft-deleted row; `remove_word_from_vocabulary` is a no-op on an already-removed one. Replaying a partially-succeeded call changes nothing.
+- **XP** — `xp_transactions` carries a partial unique index on `(user_id, source_type, source_id)`. A replayed award hits the conflict and returns `already_awarded: true` without touching `user_stats`.
+- **SRS** — reviews carry the owning `user_id`. The server RPC uses `auth.uid()`, so a queue drained under a *different* session would write one user's reviews to another account. The drainer processes only the active user's items and leaves the rest for their owner.
+
+Errors are classified before they ever reach a queue. A word-limit rejection or a validation failure is permanent — queueing it would retry a guaranteed failure every time the network flickers.
+
+## Realtime Content Sync
+
+Content is authored through a script pipeline, not a CMS. When a batch import runs, connected clients need the new articles without a pull-to-refresh — so the protected layout opens one Realtime channel across the content tables and invalidates the matching React Query namespaces.
+
+The naive version of this was a genuine outage vector. A single article import produces hundreds of row inserts, and invalidating on every event refetched every active articles query — multi-megabyte detail payloads included — hundreds of times, on every connected device at once. A textbook thundering herd, self-inflicted.
+
+Events now collect into a 5-second batch window: every event inside the window collapses into one invalidation set. Three namespaces are tracked rather than one, because their cache keys interlock — `word_lists` carries the member ID set that `words.byIds` is keyed on, so a membership change that didn't bump the words namespace would keep serving stale detail payloads for the new IDs.
+
+Realtime is a UX improvement, not a correctness requirement. If the publication is disabled, queries still refresh on stale-time expiry and pull-to-refresh.
+
+## Premium — One Predicate, Enforced in the Database
+
+```mermaid
+flowchart LR
+    subgraph store["Store"]
+        sk["StoreKit 2 / Play Billing"]
+    end
+    subgraph rc["RevenueCat"]
+        wh["Webhook"]
+        rest["REST API"]
+    end
+    subgraph pg["Postgres"]
+        fn["handle_subscription_webhook<br/><small>guarded write path</small>"]
+        pred["is_user_premium<br/><small>single predicate</small>"]
+        rls["RLS policies<br/><small>premium rows filtered here</small>"]
+    end
+    subgraph app["Client"]
+        cache["Per-user entitlement cache"]
+        cc["Cached content<br/><small>articles · word lists · words</small>"]
+    end
+
+    sk --> wh --> fn
+    fn --> pred --> rls
+    rest -->|"reconcile false negatives"| fn
+    pred --> cache
+    rls --> cc
+    cache -.->|"transition invalidates"| cc
+
+    classDef s fill:#0d9488,color:#fff,stroke:#0d9488
+    classDef c fill:#1f6feb,color:#fff,stroke:#1f6feb
+    class fn,pred,rls s
+    class cache,cc c
+```
+
+Premium content is filtered by **Row Level Security**, not by a client-side `if`. A free user's query for a premium article returns the shell row and no sentences — the enforcement is in the same place as the data.
+
+Two consequences worth calling out:
+
+**Entitlement transitions invalidate cached content.** RLS returns a *different row set* for the same query depending on premium status, but query keys have no premium dimension and articles are persisted to MMKV. The moment entitlement flips, that cache — including the empty shell article prefetched while free — is stale. A bridge watches the package's subscription store and invalidates the articles, word-lists, and words namespaces on every transition, so a purchase never lands the user on a "no content" screen.
+
+**Quota exhaustion clamps XP; it never blocks learning.** The daily drill quota is enforced server-side, counted in *words* rather than transactions — the original implementation counted `xp_transactions` rows, so a 20-word session incremented `used` by one and the intended "20 words/day" was really "~200 words/day". When the quota runs out, the award functions clamp XP to whatever remains and return `quota_exhausted` / `quota_clamped`. Reviews and SRS writes are never rejected. You can always keep studying; you just stop earning.
+
+Quota reads run under a per-user advisory lock, so two sessions finishing simultaneously can't spend the same remaining quota twice.
+
+## Data Layer
+
+```
+supabase/
+├── migrations/            32 sequential SQL migrations
+│   ├── 021_security_advisor_hardening.sql
+│   ├── 022_authz_guard_user_id_rpcs.sql
+│   ├── 025_content_premium_gating.sql
+│   ├── 028_topic_loop.sql
+│   ├── 031_drill_quota_server_enforcement.sql
+│   ├── 032_auth_audit_hardening.sql
+│   └── …
+├── schema/                Generated dump — 49 tables, 78 policies, 51 functions
+├── functions/             8 Deno Edge Functions
+│   ├── claim-subscription        Server-verified entitlement transfer
+│   ├── preflight-subscription    Conflict detection before billing fires
+│   ├── sync-subscription         RC-REST reconciliation (false negatives only)
+│   ├── verify-subscription       Entitlement check
+│   ├── revenuecat-webhook        Subscription event ingestion
+│   ├── push-notifications        Server-side push delivery
+│   ├── check-push-receipts       Delivery receipt verification
+│   └── delete-account            GDPR account + data removal
+└── __integration_tests__/ Suite that runs serially against a real test schema
+```
+
+Migrations are applied test-database first and promoted to production only after verification. Types are generated from the live schema into the repo, so a column rename fails at compile time instead of at runtime.
+
+The integration suite covers the things unit tests structurally cannot: realtime publication membership, chunked fetch behaviour, the premium predicate's parity between the webhook path and `verify-subscription`, RLS gating from an actual authenticated session, the 50-word saved cap, and subscription reconciliation.
+
+## Project Structure
+
+```
+apps/radora/
+├── app/                         expo-router — 33 routes
+│   ├── (public)/                Welcome
+│   ├── (auth)/                  Login, OTP verification
+│   └── (protected)/
+│       ├── (onboarding)/        Interest + language setup
+│       ├── (tabs)/              home · read · study · profile
+│       ├── article/[id]         Reader
+│       ├── word/[id]            Word detail
+│       ├── study-session        Drill runner
+│       ├── word-chunk           10-word set
+│       ├── premium-modal        Paywall
+│       └── …
+│
+├── src/
+│   ├── features/                Domain modules
+│   │   ├── vocabulary/          Word model, SRS, chunking, action queue
+│   │   │   ├── srs/             Scheduling service + retry queue
+│   │   │   └── chunks/          List slicing, chunk prioritisation
+│   │   ├── study-session/       Pure session engine + components
+│   │   │   └── engine/          Interleaved gap scheduler
+│   │   ├── articles/            Reader, pre-reading quiz, reactions
+│   │   ├── gamification/        XP economy, levels, streaks, award queue
+│   │   ├── progress/            Sync, topic mastery, weekly XP
+│   │   ├── subscription/        Premium bridge, gating hooks
+│   │   ├── content/             Content cache slice
+│   │   ├── notifications/       Inbox and preferences
+│   │   ├── onboarding/          Steps
+│   │   ├── home/                Dashboard
+│   │   └── settings/            Preferences, account
+│   │
+│   ├── lib/                     Core wiring
+│   │   ├── bootstrap.ts         Synchronous MMKV init — must load first
+│   │   ├── queryClient.ts       Query keys and defaults
+│   │   ├── queryPersister.ts    MMKV persistence, build-keyed cache bust
+│   │   ├── realtime/            Content sync channel
+│   │   ├── supabase/            Client, helpers, generated types
+│   │   └── telemetry-setup.ts   Sentry + PostHog
+│   │
+│   └── shared/                  Components, store slices, localization, types
+│
+├── supabase/                    Migrations, schema, Edge Functions, integration tests
+├── articles/                    Authored content source
+└── scripts/                     50+ content pipeline and ops scripts
+```
+
+### Boot order is load-bearing
+
+`bootstrap.ts` runs at module load, before anything else touches storage. Zustand's `persist` middleware reads synchronously the moment a store is *created* — which happens at import time — so if MMKV instances aren't initialised first, the app crashes on `getString` of `undefined`. The import order in the root layout is a documented contract, not a style preference.
+
+## Content Pipeline
+
+Articles aren't hand-entered. A set of TypeScript and Python scripts builds them: word-alignment analysis links every article to the vocabulary it uses, multi-sense words get contextual disambiguation, translations are validated across all three languages, images are versioned and uploaded, and a preflight check runs before anything reaches the database. Turkish translations alone went through four review passes as their own migrations, including a loanword cleanup.
+
+## Quality
+
+- **Testing** — unit tests over the session engine, SRS, chunking, and store logic, plus a serial integration suite against a real Supabase schema.
+- **Type safety** — TypeScript strict mode; database types generated from the live schema and committed.
+- **Gate** — `npm run verify` runs lint, tests, and `expo-doctor` in one command.
+- **Release** — EAS Build with local production builds; `expo-updates` on an `appVersion` runtime policy, so OTA updates never cross a native boundary.
+- **Cache correctness** — the React Query persister is keyed on the native build version, so a binary upgrade can never read a payload shaped by an older fetch. User-specific queries are excluded from persistence entirely.
+
+## Engineering Decisions Worth Calling Out
+
+- **Identity is not branding.** The app displays "Radora", but the slug, bundle identifier, scheme, EAS project ID, and the RevenueCat and Sentry project strings all stay `language-traveler`. Renaming any of them would spin up a new store listing, break premium detection for existing subscribers, and orphan crash reports. The rename stops at the surface, deliberately, and the config file says so.
+- **The server decides, the client reconciles.** SRS scheduling, XP awards, quota accounting, and premium status are all computed in Postgres. The client sends intent and applies the answer.
+- **Derive, don't denormalize.** Chunk progress, topic mastery, and weekly XP are computed from data already in the cache. No extra queries, no server-side counters to drift out of sync.
+- **Idempotency is a prerequisite for retry.** Every queued write was designed to be replay-safe before the queue was written, not after a bug proved it wasn't.
+- **Failure modes are chosen, not discovered.** Quota exhaustion clamps rather than blocks. Realtime degrades to stale-time. Stale queue items expire. Each of these is a decision recorded in the code.
+
+## Contact
+
+This is a showcase repository — the source is private.
+
+For collaboration, employment, or technical questions: [anl@icodex.dev](mailto:anl@icodex.dev) · [icodex.dev](https://icodex.dev) · [LinkedIn](https://www.linkedin.com/in/anil-burcu/)
